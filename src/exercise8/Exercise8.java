@@ -20,7 +20,7 @@ public class Exercise8 {
      */
     public static void main(String[] args) throws BadInput {
         ArrayList<Exercise> exercises = new ArrayList<Exercise>();
-        
+        exercises.add(new IntegerTreeNodeExercise());
         
         ExerciseChooser ech = new ExerciseChooser(exercises);
         ech.run();
