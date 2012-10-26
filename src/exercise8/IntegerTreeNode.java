@@ -5,6 +5,7 @@
 package exercise8;
 
 import BBK.PiJ01.common.IOGeneric;
+import com.sun.tools.example.debug.bdi.MethodNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -19,6 +20,11 @@ public class IntegerTreeNode {
     private int value;
     private IntegerTreeNode left;
     private IntegerTreeNode right;
+    private DUPLICATES duplicates = DUPLICATES.NOT_ALLOWED;
+    
+    public static enum DUPLICATES {
+        NOT_ALLOWED, ADD_LEFT, ADD_RIGHT
+    }
 
     public IntegerTreeNode(int value) {
         this.value = value;
@@ -27,32 +33,56 @@ public class IntegerTreeNode {
     private IntegerTreeNode() {}
 
     public void add(int value) {
-        if (value > this.value) {
-            if (right == null) {
-                right = new IntegerTreeNode(value);
-            } else {
-                right.add(value);
-            }
-        } else if (value < this.value) {
-            if (left == null) {
-                left = new IntegerTreeNode(value);
-            } else {
-                left.add(value);
-            }
+        if (value > this.value)
+            addRight(value);
+        else if (value < this.value)
+            addLeft(value);
+        else if (duplicates == DUPLICATES.ADD_LEFT)
+            addLeft(value);
+        else if (duplicates == DUPLICATES.ADD_RIGHT)
+            addRight(value);
+    }
+    
+    private void addLeft(int value) {
+        try {
+            left.add(value);
+        } catch (NullPointerException err) {
+            left = new IntegerTreeNode(value);
+            left.setDuplicates(duplicates);
         }
     }
+    
+    private void addRight(int value) {
+        try {
+            right.add(value);
+        } catch (NullPointerException err) {
+            right = new IntegerTreeNode(value);
+            right.setDuplicates(duplicates);
+        }
+    }
+    
+    public void setDuplicates(DUPLICATES duplicates) {
+        this.duplicates = duplicates;
+    }
 
-    public boolean contains(int value) {
+    public boolean contains(int value, boolean ...verbose) {
+        assert verbose.length <= 1;
+        boolean print_verbosity = false;
+        if (verbose.length == 1 && verbose[0]) {
+            System.out.format("Checking element containing %d\n", value);
+            print_verbosity = true;
+        }
+        
         if (value == this.value) {
             return true;
         }
 
         try {
             if (value > this.value) {
-                return right.contains(value);
+                return right.contains(value, print_verbosity);
             }
             if (value < this.value) {
-                return left.contains(value);
+                return left.contains(value, print_verbosity);
             }
         } catch (NullPointerException err) {}
         return false;
