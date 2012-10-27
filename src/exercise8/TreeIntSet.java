@@ -28,5 +28,14 @@ public class TreeIntSet implements IntSet {
     public boolean containsVerbose(int value) {
         return top.contains(value, true);
     }
+    
+    @Override
+    public String toString() {
+        return top.toCommaSeparatedString();
+    }
+    
+    public void rebalance() {
+        top.rebalance();
+    }
 
 }

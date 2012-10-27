@@ -21,6 +21,7 @@ public class Exercise8 {
     public static void main(String[] args) throws BadInput {
         ArrayList<Exercise> exercises = new ArrayList<Exercise>();
         exercises.add(new IntegerTreeNodeExercise());
+        exercises.add(new SetExercise());
         
         ExerciseChooser ech = new ExerciseChooser(exercises);
         ech.run();

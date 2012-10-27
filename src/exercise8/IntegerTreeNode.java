@@ -69,7 +69,7 @@ public class IntegerTreeNode {
         assert verbose.length <= 1;
         boolean print_verbosity = false;
         if (verbose.length == 1 && verbose[0]) {
-            System.out.format("Checking element containing %d\n", value);
+            System.out.format("Checking element containing %d\n", this.value);
             print_verbosity = true;
         }
         
@@ -111,6 +111,14 @@ public class IntegerTreeNode {
                                         (right==null? "":" R["+right+"]"));
         
         //return " [" + value + (left==null? "":left) + (right==null? "":right) + "]";
+        
+    }
+    
+    public String toCommaSeparatedString() {
+        
+        return String.format("%d%s%s", value, 
+                                        (left==null? "":","+left.toCommaSeparatedString()),
+                                        (right==null? "":","+right.toCommaSeparatedString()));
         
     }
     
