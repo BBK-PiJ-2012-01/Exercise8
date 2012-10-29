@@ -5,22 +5,35 @@
 package exercise8;
 
 import BBK.PiJ01.common.IOGeneric;
-import com.sun.tools.example.debug.bdi.MethodNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  *
  * @author Sam Wright <swrigh11@dcs.bbk.ac.uk>
  */
-public class IntegerTreeNode {
+public class IntegerTreeNode extends AbstractTreeNode {
 
     private int value;
     private IntegerTreeNode left;
     private IntegerTreeNode right;
     private DUPLICATES duplicates = DUPLICATES.NOT_ALLOWED;
+
+    @Override
+    String valueString() {
+        return String.valueOf(value);
+    }
+
+    @Override
+    protected IntegerTreeNode getLeft() {
+        return left;
+    }
+
+    @Override
+    protected IntegerTreeNode getRight() {
+        return right;
+    }
     
     public static enum DUPLICATES {
         NOT_ALLOWED, ADD_LEFT, ADD_RIGHT
@@ -104,38 +117,6 @@ public class IntegerTreeNode {
         }
     }
     
-    public String toString() {
-        
-        return String.format("%d%s%s", value, 
-                                        (left==null? "":" L["+left+"]"),
-                                        (right==null? "":" R["+right+"]"));
-        
-        //return " [" + value + (left==null? "":left) + (right==null? "":right) + "]";
-        
-    }
-    
-    public String toCommaSeparatedString() {
-        
-        return String.format("%d%s%s", value, 
-                                        (left==null? "":","+left.toCommaSeparatedString()),
-                                        (right==null? "":","+right.toCommaSeparatedString()));
-        
-    }
-    
-    public int depth() {
-        if (isLeaf())
-            return 0;
-        if (left != null && right == null)
-            return left.depth() + 1;
-        if (left == null && right != null)
-            return right.depth() + 1;
-        return Math.max(left.depth(), right.depth()) + 1;
-    }
-    
-    public boolean isLeaf() {
-        return left == null && right == null;
-    }
-    
     public IntegerTreeNode getParent(int value) {
         try {
             if (value > this.value) {
@@ -166,12 +147,10 @@ public class IntegerTreeNode {
             } else {
                 try {
                     int min_on_right = right.getMin();
-                    System.out.println("min_from " + right.value + " = " + min_on_right);
                     remove(min_on_right);
                     this.value = min_on_right;
                 } catch (NullPointerException err) {
                     int max_on_left = left.getMax();
-                    System.out.println("max_from " + left.value + " = " + max_on_left);
                     remove(max_on_left);
                     this.value = max_on_left;
                 }
@@ -201,29 +180,20 @@ public class IntegerTreeNode {
     }
     
     private void rebalance(List<Integer> lst) {
-        if (lst.size() == 0)
+        if (lst.isEmpty())
             return;
         
         int median_index = lst.size()/2;
         value = lst.get(median_index);
         
-        Integer[] total_lst = lst.toArray(new Integer[0]);
-        //System.out.println("\ntotal_list = " + IOGeneric.listToString(total_lst, "[,]"));
-        
         if (0 < median_index) {
             left = new IntegerTreeNode();
-            //return values.toArray(new String[0]);
-            Integer[] left_lst = lst.subList(0, median_index).toArray(new Integer[0]);
-            System.out.println("\ntotal_list = "+IOGeneric.listToString(total_lst, "[,]")+ "   left_list = " + IOGeneric.listToString(left_lst, "[,]"));
             left.rebalance(lst.subList(0, median_index));
         }
         if (median_index+1 < lst.size()) {
-            Integer[] left_lst = lst.subList(median_index+1, lst.size()).toArray(new Integer[0]);
-            System.out.println("\ntotal_list = "+IOGeneric.listToString(total_lst, "[,]")+ "   right_list = " + IOGeneric.listToString(left_lst, "[,]"));
             right = new IntegerTreeNode();
             right.rebalance(lst.subList(median_index+1, lst.size()));
-        }
-            
+        }  
     }
     
     public ArrayList<Integer> serialise() {

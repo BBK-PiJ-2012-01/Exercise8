@@ -31,7 +31,7 @@ public class TreeIntSet implements IntSet {
     
     @Override
     public String toString() {
-        return top.toCommaSeparatedString();
+        return top.toString();
     }
     
     public void rebalance() {

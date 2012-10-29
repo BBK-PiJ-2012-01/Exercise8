@@ -10,7 +10,7 @@ package exercise8;
  * @author Sam Wright <swrigh11@dcs.bbk.ac.uk>
  */
 public class SimpleLinkedList {
-    Element first;
+    protected Element first;
     
     public void add(int value) {
         Element new_first = new Element(value);

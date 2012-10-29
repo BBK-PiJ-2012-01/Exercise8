@@ -22,6 +22,7 @@ public class Exercise8 {
         ArrayList<Exercise> exercises = new ArrayList<Exercise>();
         exercises.add(new IntegerTreeNodeExercise());
         exercises.add(new SetExercise());
+        exercises.add(new SortedListExercise());
         
         ExerciseChooser ech = new ExerciseChooser(exercises);
         ech.run();
