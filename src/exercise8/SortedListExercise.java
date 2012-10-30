@@ -16,13 +16,13 @@ public class SortedListExercise implements Exercise {
     
     @Override
     public String getTitle() {
-        return "Trees and LinkedLists as sets.";
+        return "Trees and LinkedLists as always-sorted lists.";
     }
 
     @Override
     public String getDescription() {
-        return "Demonstrates two implementations of a set, based on binary\n"
-                + "trees and linked lists.";
+        return "Demonstrates two implementations of a sorted list,\n"
+                + "based on binary trees and linked lists.";
     }
 
     @Override
