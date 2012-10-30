@@ -23,6 +23,7 @@ public class Exercise8 {
         exercises.add(new IntegerTreeNodeExercise());
         exercises.add(new SetExercise());
         exercises.add(new SortedListExercise());
+        exercises.add(new SyntaxTreeExercise());
         
         ExerciseChooser ech = new ExerciseChooser(exercises);
         ech.run();
