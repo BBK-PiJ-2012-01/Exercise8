@@ -7,6 +7,7 @@ package exercise8;
 import BBK.PiJ01.common.BadInput;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  *
@@ -38,30 +39,6 @@ public class SyntaxTree extends AbstractTreeNode {
     }
 
     private void add(String str) throws BadInput {
-        /*
-         * Plan:
-         *      for-loop:
-         *          if ch == '(' then ++nested_level and ++total_nests
-         *          if ch == ')' then --nested_level
-         *          if nested_level == 0 && ch == '+' then op_list.add(ch_location), this.value = '+'
-         *          if this.value == null && ch == '-' then op_list.add(ch_location), this.value = '-'
-         *          if this.value == null && ch == '*' then op_list.add(ch_location), this.value = '*'
-         *          if this.value == null && ch == '/' then op_list.add(ch_location), this.value = '/'
-         * 
-         *      if nested_level != 0 then throw new BadInput()
-         * 
-         *      if this.value != null then split string at median location in op_list,
-         *          with left and right taking their components.
-         *          NB. in "-5 - 6" we'd like to avoid the first '-' being taken,
-         *              so split at median erring on the right side.
-         * 
-         *      else if this.value == null and total_nests == 1 and charAt(0) = '(' and charAt(end) = ')'
-         *              then this.add( str.substring(1, end-1) ); return;
-         * 
-         *      else if total_nest = 0 and str.isDouble() then this.value = str
-         *          
-         */
-
         str.replaceAll(" ", "");
         if (str.isEmpty())
             throw new BadInput("Received empty string");
@@ -74,6 +51,11 @@ public class SyntaxTree extends AbstractTreeNode {
             ch = str.charAt(i);
 
             if (ch == '(') {
+                // If no operator has been found, add locations of the '(' 
+                // belonging to top-level brackets.
+                if (nested_level == 0 && chosen_operator < 0 ) {
+                    op_locations.add(i);
+                }
                 ++nested_level;
                 continue;
             }
@@ -114,29 +96,60 @@ public class SyntaxTree extends AbstractTreeNode {
         // If I found an operand, split the string at the median
         // location of that operand.
         if (chosen_operator > -1) {
-            int median_operator_location;
-            median_operator_location = op_locations.get(op_locations.size()/2);
+            int median_op_location = op_locations.get(op_locations.size()/2);
             value = String.valueOf(operands[chosen_operator]);
             
-            left = new SyntaxTree( str.substring(0, median_operator_location) );
-            right = new SyntaxTree( str.substring(median_operator_location+1) );
+            left = new SyntaxTree( str.substring(0, median_op_location) );
+            right = new SyntaxTree( str.substring(median_op_location+1) );
             return;
         }
         
-        // If str == "( stuff... )" then remove outer parens and try 'add' again
-        // NB. This also catches "(...)(...)", so assumed multiplication is caught
-        // here and will throw a BadInput when adding "...)(...".
-        if (str.charAt(0) == '(' && str.charAt(str.length()-1) == ')') {
+        // If str == "( ...stuff... )" then remove outer parens and try 'add' again
+        if (str.charAt(0) == '(' && str.charAt(str.length()-1) == ')' 
+                && op_locations.size() == 1) {
             add(str.substring(1, str.length()-1));
+            return;
+        }
+        System.out.println("ops = " + op_locations.size()+ " : " + str);
+        
+        // No operands, only numbers and brackets.
+        if (op_locations.size() >= 1) {
+            // "(1+2)(3+4)" and "5(3+3)" are fine, but "(3+3)5(4+4)" is not.
+            // ie. all but the first '(' must be preceeded by ')'
+            ListIterator<Integer> left_paren_pos = op_locations.listIterator();
+            left_paren_pos.next();  // ignore the first '('
+            int right_paren_pos;
+            while (left_paren_pos.hasNext()) {
+                if ( str.charAt(left_paren_pos.next()-1) != ')' )
+                    throw new BadInput("A number proceeded a paren: " + str);
+            }
+            
+            // All '(' represent a '*(', except for the first '(' if it's at
+            // the start of str.
+            if (op_locations.get(0) == 0)
+                op_locations.remove(0);
+            
+            // Finally, need to weed out equations of the form "(4+3)2".
+            if (op_locations.size() == 0)
+                throw new BadInput("A number proceeded a paren: " + str);
+            
+            // Now all op_locations actually refer to an operator.  So again we
+            // choose the median operator and split accordingly.
+            int median_op_location = op_locations.get(op_locations.size()/2);
+            value = "*";
+            left = new SyntaxTree( str.substring(0, median_op_location) );
+            right = new SyntaxTree( str.substring(median_op_location) );
             return;
         }
         
         // If I've got this far, then there's no operands and no parens
         // (ignoring assumed multiplication), so it must be a number.
+        // I'll just check it's a double
+        Double.valueOf(str);
         value = str;
 
     }
-
+    
     private int getOperator(char ch) {
         for (int j = 0; j < operands.length; ++j) {
             if (operands[j] == ch) {

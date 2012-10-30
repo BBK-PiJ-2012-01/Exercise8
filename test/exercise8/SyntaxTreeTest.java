@@ -53,6 +53,12 @@ public class SyntaxTreeTest {
         assertEquals(15, evaluate("5*3"), 0.001);
     }
     
+    @Test
+    public void testImpliedMultiplication() {
+        assertEquals(27, evaluate("3(4+5)"), 0.001);
+        assertEquals(27, evaluate("(1+2)(4+5)"), 0.001);
+    }
+    
     
     @Test
     public void testPower() {
